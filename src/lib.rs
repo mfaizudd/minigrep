@@ -1,4 +1,4 @@
-use std::{error::Error, fs, env};
+use std::{env, error::Error, fs};
 
 #[cfg(test)]
 mod tests {
@@ -73,7 +73,7 @@ pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a st
 pub struct Config {
     pub query: String,
     pub filename: String,
-    pub case_sensitive: bool
+    pub case_sensitive: bool,
 }
 
 impl Config {
@@ -83,8 +83,16 @@ impl Config {
         }
         let query = args[1].clone();
         let filename = args[2].clone();
-        let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
+        let case_sensitive = if !env::var("CASE_INSENSITIVE").is_err() {
+            env::var("CASE_INSENSITIVE").is_err()
+        } else {
+            args.get(3).is_none()
+        };
 
-        Ok(Config { query, filename, case_sensitive })
+        Ok(Config {
+            query,
+            filename,
+            case_sensitive,
+        })
     }
 }
